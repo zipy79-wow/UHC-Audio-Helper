@@ -1,0 +1,9 @@
+## Interface: 11505
+## Title: UHC Sound Bites
+## Notes: Plays sound notifications for useful events (like reaching max HP) in WoW Classic Hardcore.
+## Author: Jules
+## Version: 1.0.0
+## SavedVariables: UHCSoundBitesDB
+
+Core.lua
+Options.lua
