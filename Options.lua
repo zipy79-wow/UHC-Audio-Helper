@@ -8,7 +8,9 @@ local defaults = {
     onlyResting = false,    -- play ONLY when resting (overrides above if true)
     soundType = "builtin",  -- "builtin" or "custom"
     builtinSound = "QuestCompleted", -- Just an example sound
-    customSoundPath = "Interface\\AddOns\\UHCSoundBites\\Sounds\\custom.ogg"
+    customSoundPath = "Interface\\AddOns\\UHCSoundBites\\Sounds\\custom.ogg",
+    fishingEnabled = true,   -- Enable volume boosting while fishing
+    fishingVolumeBoost = true -- Maximize SFX volume and mute other sounds while fishing
 }
 
 -- Create the Options Panel
@@ -55,17 +57,26 @@ optionsPanel:SetScript("OnShow", function(self)
     local inCombatCb = createCheckbutton(self, "UHCSBInCombatCB", "Play In Combat", "Play sound when you reach full HP during combat.", "inCombat", -110)
     local onlyRestingCb = createCheckbutton(self, "UHCSBOnlyRestingCB", "Play ONLY while Resting", "If checked, the sound will ONLY play if you are in a rested state.", "onlyResting", -140)
 
+    local fishingEnabledCb = createCheckbutton(self, "UHCSBFishingEnabledCB", "Enable Fishing Alerts", "Enable features for fishing.", "fishingEnabled", -170)
+    local fishingVolumeBoostCb = createCheckbutton(self, "UHCSBFishingVolumeBoostCB", "Boost Fishing Volume", "Maximize SFX volume and mute music/ambience/dialog while fishing.", "fishingVolumeBoost", -200)
+
+    local fishingLabel = self:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
+    fishingLabel:SetPoint("TOPLEFT", 16, -230)
+    fishingLabel:SetWidth(400)
+    fishingLabel:SetJustifyH("LEFT")
+    fishingLabel:SetText("Note: To replace the bobber splash sound, place a file named 'FishingBobber_ver2_1.ogg' (and versions 2 and 3) in your 'World of Warcraft\\_classic_\\Sound\\Spells\\' directory and restart the game.")
+
     -- Sound Type Dropdown / Radio Buttons
     local soundTypeLabel = self:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-    soundTypeLabel:SetPoint("TOPLEFT", 16, -180)
+    soundTypeLabel:SetPoint("TOPLEFT", 16, -280)
     soundTypeLabel:SetText("Sound Source:")
 
     local builtinCb = CreateFrame("CheckButton", "UHCSBBuiltinCB", self, "UIRadioButtonTemplate")
-    builtinCb:SetPoint("TOPLEFT", 120, -175)
+    builtinCb:SetPoint("TOPLEFT", 120, -275)
     _G[builtinCb:GetName() .. "Text"]:SetText("Built-in")
 
     local customCb = CreateFrame("CheckButton", "UHCSBCustomCB", self, "UIRadioButtonTemplate")
-    customCb:SetPoint("TOPLEFT", 220, -175)
+    customCb:SetPoint("TOPLEFT", 220, -275)
     _G[customCb:GetName() .. "Text"]:SetText("Custom File")
 
     builtinCb:SetChecked(UHCSoundBitesDB.soundType == "builtin")
@@ -85,7 +96,7 @@ optionsPanel:SetScript("OnShow", function(self)
     -- Custom Sound EditBox
     local customSoundEditBox = CreateFrame("EditBox", "UHCSBCustomEditBox", self, "InputBoxTemplate")
     customSoundEditBox:SetSize(300, 20)
-    customSoundEditBox:SetPoint("TOPLEFT", 16, -220)
+    customSoundEditBox:SetPoint("TOPLEFT", 16, -320)
     customSoundEditBox:SetAutoFocus(false)
     customSoundEditBox:SetText(UHCSoundBitesDB.customSoundPath)
 
@@ -102,7 +113,7 @@ optionsPanel:SetScript("OnShow", function(self)
     -- Test Button
     local testButton = CreateFrame("Button", "UHCSBTestButton", self, "UIPanelButtonTemplate")
     testButton:SetSize(100, 22)
-    testButton:SetPoint("TOPLEFT", 16, -260)
+    testButton:SetPoint("TOPLEFT", 16, -360)
     testButton:SetText("Test Sound")
     testButton:SetScript("OnClick", function()
         if UHCSoundBitesDB.soundType == "builtin" then
