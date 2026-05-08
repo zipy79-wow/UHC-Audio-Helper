@@ -10,7 +10,8 @@ local defaults = {
     builtinSound = "QuestCompleted", -- Just an example sound
     customSoundPath = "Interface\\AddOns\\UHCSoundBites\\Sounds\\custom.ogg",
     fishingEnabled = true,   -- Enable volume boosting while fishing
-    fishingVolumeBoost = true -- Maximize SFX volume and mute other sounds while fishing
+    fishingSFXVolume = 1.0,  -- Default to max volume for SFX
+    fishingBackgroundVolume = 0.1 -- Default to 10% volume for Music/Ambience/Dialog
 }
 
 -- Create the Options Panel
@@ -58,25 +59,55 @@ optionsPanel:SetScript("OnShow", function(self)
     local onlyRestingCb = createCheckbutton(self, "UHCSBOnlyRestingCB", "Play ONLY while Resting", "If checked, the sound will ONLY play if you are in a rested state.", "onlyResting", -140)
 
     local fishingEnabledCb = createCheckbutton(self, "UHCSBFishingEnabledCB", "Enable Fishing Alerts", "Enable features for fishing.", "fishingEnabled", -170)
-    local fishingVolumeBoostCb = createCheckbutton(self, "UHCSBFishingVolumeBoostCB", "Boost Fishing Volume", "Maximize SFX volume and mute music/ambience/dialog while fishing.", "fishingVolumeBoost", -200)
+
+    -- Sliders for Fishing Volumes
+    local function createSlider(parent, name, label, tooltip, dbKey, yOffset)
+        local slider = CreateFrame("Slider", name, parent, "OptionsSliderTemplate")
+        slider:SetPoint("TOPLEFT", 26, yOffset)
+        slider:SetMinMaxValues(0, 1)
+        slider:SetValueStep(0.01)
+        slider:SetObeyStepOnDrag(true)
+        slider:SetValue(UHCSoundBitesDB[dbKey])
+
+        _G[slider:GetName() .. "Text"]:SetText(label)
+        _G[slider:GetName() .. "Low"]:SetText("0%")
+        _G[slider:GetName() .. "High"]:SetText("100%")
+
+        slider.tooltipText = tooltip
+
+        local valueText = slider:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+        valueText:SetPoint("TOP", slider, "BOTTOM", 0, -3)
+        valueText:SetText(math.floor(slider:GetValue() * 100) .. "%")
+        slider.valueText = valueText
+
+        slider:SetScript("OnValueChanged", function(self, value)
+            UHCSoundBitesDB[dbKey] = value
+            self.valueText:SetText(math.floor(value * 100) .. "%")
+        end)
+
+        return slider
+    end
+
+    local sfxVolumeSlider = createSlider(self, "UHCSBFishingSFXSlider", "Fishing SFX/Master Volume", "Set the volume for sound effects and master volume while fishing.", "fishingSFXVolume", -210)
+    local bgVolumeSlider = createSlider(self, "UHCSBFishingBGSlider", "Fishing Background Volume", "Set the volume for music, ambience, and dialog while fishing.", "fishingBackgroundVolume", -260)
 
     local fishingLabel = self:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
-    fishingLabel:SetPoint("TOPLEFT", 16, -230)
+    fishingLabel:SetPoint("TOPLEFT", 16, -310)
     fishingLabel:SetWidth(400)
     fishingLabel:SetJustifyH("LEFT")
     fishingLabel:SetText("Note: To replace the bobber splash sound, place a file named 'FishingBobber_ver2_1.ogg' (and versions 2 and 3) in your 'World of Warcraft\\_classic_\\Sound\\Spells\\' directory and restart the game.")
 
     -- Sound Type Dropdown / Radio Buttons
     local soundTypeLabel = self:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-    soundTypeLabel:SetPoint("TOPLEFT", 16, -280)
+    soundTypeLabel:SetPoint("TOPLEFT", 16, -360)
     soundTypeLabel:SetText("Sound Source:")
 
     local builtinCb = CreateFrame("CheckButton", "UHCSBBuiltinCB", self, "UIRadioButtonTemplate")
-    builtinCb:SetPoint("TOPLEFT", 120, -275)
+    builtinCb:SetPoint("TOPLEFT", 120, -355)
     _G[builtinCb:GetName() .. "Text"]:SetText("Built-in")
 
     local customCb = CreateFrame("CheckButton", "UHCSBCustomCB", self, "UIRadioButtonTemplate")
-    customCb:SetPoint("TOPLEFT", 220, -275)
+    customCb:SetPoint("TOPLEFT", 220, -355)
     _G[customCb:GetName() .. "Text"]:SetText("Custom File")
 
     builtinCb:SetChecked(UHCSoundBitesDB.soundType == "builtin")
@@ -96,7 +127,7 @@ optionsPanel:SetScript("OnShow", function(self)
     -- Custom Sound EditBox
     local customSoundEditBox = CreateFrame("EditBox", "UHCSBCustomEditBox", self, "InputBoxTemplate")
     customSoundEditBox:SetSize(300, 20)
-    customSoundEditBox:SetPoint("TOPLEFT", 16, -320)
+    customSoundEditBox:SetPoint("TOPLEFT", 16, -400)
     customSoundEditBox:SetAutoFocus(false)
     customSoundEditBox:SetText(UHCSoundBitesDB.customSoundPath)
 
@@ -113,7 +144,7 @@ optionsPanel:SetScript("OnShow", function(self)
     -- Test Button
     local testButton = CreateFrame("Button", "UHCSBTestButton", self, "UIPanelButtonTemplate")
     testButton:SetSize(100, 22)
-    testButton:SetPoint("TOPLEFT", 16, -360)
+    testButton:SetPoint("TOPLEFT", 16, -440)
     testButton:SetText("Test Sound")
     testButton:SetScript("OnClick", function()
         if UHCSoundBitesDB.soundType == "builtin" then
