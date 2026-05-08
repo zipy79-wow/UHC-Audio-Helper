@@ -6,10 +6,15 @@ frame:RegisterEvent("UNIT_HEALTH")
 frame:RegisterEvent("PLAYER_REGEN_DISABLED")
 frame:RegisterEvent("PLAYER_REGEN_ENABLED")
 frame:RegisterEvent("PLAYER_UPDATE_RESTING")
+frame:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START")
+frame:RegisterEvent("UNIT_SPELLCAST_CHANNEL_STOP")
 
 local wasFullHealth = true
 local inCombat = false
 local isResting = false
+
+local isFishing = false
+local savedVolumes = {}
 
 local function PlayNotificationSound()
     if not UHCSoundBitesDB.enabled then return end
@@ -28,6 +33,34 @@ local function PlayNotificationSound()
         PlaySound(618) -- Quest Complete
     else
         PlaySoundFile(UHCSoundBitesDB.customSoundPath)
+    end
+end
+
+local function RestoreVolumes()
+    if isFishing and savedVolumes.master then
+        SetCVar("Sound_MasterVolume", savedVolumes.master)
+        SetCVar("Sound_SFXVolume", savedVolumes.sfx)
+        SetCVar("Sound_MusicVolume", savedVolumes.music)
+        SetCVar("Sound_AmbienceVolume", savedVolumes.ambience)
+        SetCVar("Sound_DialogVolume", savedVolumes.dialog)
+        isFishing = false
+    end
+end
+
+local function MaximizeFishingVolumes()
+    if not isFishing then
+        savedVolumes.master = GetCVar("Sound_MasterVolume")
+        savedVolumes.sfx = GetCVar("Sound_SFXVolume")
+        savedVolumes.music = GetCVar("Sound_MusicVolume")
+        savedVolumes.ambience = GetCVar("Sound_AmbienceVolume")
+        savedVolumes.dialog = GetCVar("Sound_DialogVolume")
+
+        SetCVar("Sound_MasterVolume", 1.0)
+        SetCVar("Sound_SFXVolume", 1.0)
+        SetCVar("Sound_MusicVolume", 0.0)
+        SetCVar("Sound_AmbienceVolume", 0.0)
+        SetCVar("Sound_DialogVolume", 0.0)
+        isFishing = true
     end
 end
 
@@ -56,5 +89,21 @@ frame:SetScript("OnEvent", function(self, event, ...)
         inCombat = false
     elseif event == "PLAYER_UPDATE_RESTING" then
         isResting = IsResting()
+    elseif event == "UNIT_SPELLCAST_CHANNEL_START" then
+        local unit, castGUID, spellID = ...
+        if unit == "player" then
+            -- Fishing spell IDs (Common is 7620, but can be others depending on skill/items)
+            local spellName = C_Spell and C_Spell.GetSpellName and C_Spell.GetSpellName(spellID) or GetSpellInfo(spellID)
+            if spellName == "Fishing" then
+                if UHCSoundBitesDB.fishingEnabled and UHCSoundBitesDB.fishingVolumeBoost then
+                    MaximizeFishingVolumes()
+                end
+            end
+        end
+    elseif event == "UNIT_SPELLCAST_CHANNEL_STOP" then
+        local unit = ...
+        if unit == "player" and isFishing then
+            RestoreVolumes()
+        end
     end
 end)
