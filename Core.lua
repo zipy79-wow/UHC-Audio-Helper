@@ -55,11 +55,11 @@ local function MaximizeFishingVolumes()
         savedVolumes.ambience = GetCVar("Sound_AmbienceVolume")
         savedVolumes.dialog = GetCVar("Sound_DialogVolume")
 
-        SetCVar("Sound_MasterVolume", 1.0)
-        SetCVar("Sound_SFXVolume", 1.0)
-        SetCVar("Sound_MusicVolume", 0.0)
-        SetCVar("Sound_AmbienceVolume", 0.0)
-        SetCVar("Sound_DialogVolume", 0.0)
+        SetCVar("Sound_MasterVolume", UHCSoundBitesDB.fishingSFXVolume)
+        SetCVar("Sound_SFXVolume", UHCSoundBitesDB.fishingSFXVolume)
+        SetCVar("Sound_MusicVolume", UHCSoundBitesDB.fishingBackgroundVolume)
+        SetCVar("Sound_AmbienceVolume", UHCSoundBitesDB.fishingBackgroundVolume)
+        SetCVar("Sound_DialogVolume", UHCSoundBitesDB.fishingBackgroundVolume)
         isFishing = true
     end
 end
@@ -95,7 +95,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
             -- Fishing spell IDs (Common is 7620, but can be others depending on skill/items)
             local spellName = C_Spell and C_Spell.GetSpellName and C_Spell.GetSpellName(spellID) or GetSpellInfo(spellID)
             if spellName == "Fishing" then
-                if UHCSoundBitesDB.fishingEnabled and UHCSoundBitesDB.fishingVolumeBoost then
+                if UHCSoundBitesDB.fishingEnabled then
                     MaximizeFishingVolumes()
                 end
             end
