@@ -1,5 +1,26 @@
 local addonName, addonTable = ...
 
+function addonTable.SanitizePath(path)
+    if not path or type(path) ~= "string" or path == "" then
+        return "Interface\\AddOns\\UHCSoundBites\\Sounds\\custom.ogg"
+    end
+
+    -- Normalize slashes
+    local sanitized = path:gsub("/", "\\")
+
+    -- Remove any directory traversal sequences
+    while sanitized:find("%.%.") do
+        sanitized = sanitized:gsub("%.%.", "")
+    end
+
+    -- Ensure it starts with Interface\AddOns\ (case-insensitive)
+    if not sanitized:lower():find("^interface\\addons\\") then
+        return "Interface\\AddOns\\UHCSoundBites\\Sounds\\custom.ogg"
+    end
+
+    return sanitized
+end
+
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("PLAYER_ENTERING_WORLD")
 frame:RegisterEvent("UNIT_HEALTH")
@@ -32,7 +53,7 @@ local function PlayNotificationSound()
     if UHCSoundBitesDB.soundType == "builtin" then
         PlaySound(618) -- Quest Complete
     else
-        PlaySoundFile(UHCSoundBitesDB.customSoundPath)
+        PlaySoundFile(addonTable.SanitizePath(UHCSoundBitesDB.customSoundPath))
     end
 end
 

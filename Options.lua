@@ -137,7 +137,7 @@ optionsPanel:SetScript("OnShow", function(self)
 
     customSoundEditBox:SetScript("OnTextChanged", function(self, userInput)
         if userInput then
-            UHCSoundBitesDB.customSoundPath = self:GetText()
+            UHCSoundBitesDB.customSoundPath = addonTable.SanitizePath(self:GetText())
         end
     end)
 
@@ -150,7 +150,7 @@ optionsPanel:SetScript("OnShow", function(self)
         if UHCSoundBitesDB.soundType == "builtin" then
             PlaySound(618) -- Quest completed
         else
-            PlaySoundFile(UHCSoundBitesDB.customSoundPath)
+            PlaySoundFile(addonTable.SanitizePath(UHCSoundBitesDB.customSoundPath))
         end
     end)
 end)
@@ -170,6 +170,8 @@ eventFrame:SetScript("OnEvent", function(self, event, arg1)
                 end
             end
         end
+        -- Sanitize existing path on load
+        UHCSoundBitesDB.customSoundPath = addonTable.SanitizePath(UHCSoundBitesDB.customSoundPath)
         addonTable.db = UHCSoundBitesDB
         self:UnregisterEvent("ADDON_LOADED")
     end
