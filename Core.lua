@@ -37,11 +37,24 @@ local isResting = false
 local isFishing = false
 local savedVolumes = {}
 
+function addonTable.DebugLog(msg)
+    if UHCSoundBitesDB and UHCSoundBitesDB.debugMode then
+        DEFAULT_CHAT_FRAME:AddMessage("|cFF00FF00[UHCSoundBites Debug]:|r " .. tostring(msg))
+    end
+end
+
 local function PlayNotificationSound()
-    if not UHCSoundBitesDB.enabled then return end
+    addonTable.DebugLog("Attempting to play notification sound...")
+    if not UHCSoundBitesDB.enabled then
+        addonTable.DebugLog("PlayNotificationSound returned early: Addon disabled.")
+        return
+    end
 
     -- Check resting condition
-    if UHCSoundBitesDB.onlyResting and not isResting then return end
+    if UHCSoundBitesDB.onlyResting and not isResting then
+        addonTable.DebugLog("PlayNotificationSound returned early: onlyResting is true, but player is not resting.")
+        return
+    end
 
     -- Check combat conditions (only evaluated if onlyResting is false, or if we are resting)
     if not UHCSoundBitesDB.onlyResting then
@@ -51,14 +64,17 @@ local function PlayNotificationSound()
 
     -- Play sound
     if UHCSoundBitesDB.soundType == "builtin" then
+        addonTable.DebugLog("Playing builtin sound (ID: 618).")
         PlaySound(618) -- Quest Complete
     else
-        PlaySoundFile(addonTable.SanitizePath(UHCSoundBitesDB.customSoundPath))
+        addonTable.DebugLog("Playing custom sound (" .. tostring(UHCSoundBitesDB.customSoundPath) .. ").")
+        PlaySoundFile(UHCSoundBitesDB.customSoundPath)
     end
 end
 
 local function RestoreVolumes()
     if isFishing and savedVolumes.master then
+        addonTable.DebugLog("Restoring volumes after fishing.")
         SetCVar("Sound_MasterVolume", savedVolumes.master)
         SetCVar("Sound_SFXVolume", savedVolumes.sfx)
         SetCVar("Sound_MusicVolume", savedVolumes.music)
@@ -70,6 +86,7 @@ end
 
 local function MaximizeFishingVolumes()
     if not isFishing then
+        addonTable.DebugLog("Maximizing volumes for fishing.")
         savedVolumes.master = GetCVar("Sound_MasterVolume")
         savedVolumes.sfx = GetCVar("Sound_SFXVolume")
         savedVolumes.music = GetCVar("Sound_MusicVolume")
@@ -89,6 +106,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
     if event == "PLAYER_ENTERING_WORLD" then
         inCombat = InCombatLockdown()
         isResting = IsResting()
+        addonTable.DebugLog("PLAYER_ENTERING_WORLD: inCombat=" .. tostring(inCombat) .. ", isResting=" .. tostring(isResting))
     elseif event == "UNIT_HEALTH" then
         local unit = ...
         if unit == "player" then
@@ -99,6 +117,7 @@ frame:SetScript("OnEvent", function(self, event, ...)
 
             -- Only trigger when we transition from NOT full health to FULL health
             if isFullHealth and not wasFullHealth then
+                addonTable.DebugLog("UNIT_HEALTH: Reached full health.")
                 PlayNotificationSound()
             end
 
@@ -106,10 +125,13 @@ frame:SetScript("OnEvent", function(self, event, ...)
         end
     elseif event == "PLAYER_REGEN_DISABLED" then
         inCombat = true
+        addonTable.DebugLog("PLAYER_REGEN_DISABLED: Entered combat.")
     elseif event == "PLAYER_REGEN_ENABLED" then
         inCombat = false
+        addonTable.DebugLog("PLAYER_REGEN_ENABLED: Left combat.")
     elseif event == "PLAYER_UPDATE_RESTING" then
         isResting = IsResting()
+        addonTable.DebugLog("PLAYER_UPDATE_RESTING: isResting=" .. tostring(isResting))
     elseif event == "UNIT_SPELLCAST_CHANNEL_START" then
         local unit, castGUID, spellID = ...
         if unit == "player" then

@@ -10,7 +10,8 @@ local defaults = {
     customSoundPath = "Interface\\AddOns\\UHCSoundBites\\Sounds\\custom.ogg",
     fishingEnabled = true,   -- Enable volume boosting while fishing
     fishingSFXVolume = 1.0,  -- Default to max volume for SFX
-    fishingBackgroundVolume = 0.1 -- Default to 10% volume for Music/Ambience/Dialog
+    fishingBackgroundVolume = 0.1, -- Default to 10% volume for Music/Ambience/Dialog
+    debugMode = false        -- Output debug logs to chat
 }
 
 -- Create the Options Panel
@@ -152,6 +153,9 @@ optionsPanel:SetScript("OnShow", function(self)
             PlaySoundFile(addonTable.SanitizePath(UHCSoundBitesDB.customSoundPath))
         end
     end)
+
+    -- Debug Mode Checkbox
+    local debugModeCb = createCheckbutton(self, "UHCSBDebugModeCB", "Enable Debug Mode", "Prints debug messages to your chat window. Useful for testing if the addon works correctly.", "debugMode", -480)
 end)
 
 -- Initialize Settings on Load
