@@ -7,7 +7,6 @@ local defaults = {
     outOfCombat = true,     -- play when out of combat
     onlyResting = false,    -- play ONLY when resting (overrides above if true)
     soundType = "builtin",  -- "builtin" or "custom"
-    builtinSound = "QuestCompleted", -- Just an example sound
     customSoundPath = "Interface\\AddOns\\UHCSoundBites\\Sounds\\custom.ogg",
     fishingEnabled = true,   -- Enable volume boosting while fishing
     fishingSFXVolume = 1.0,  -- Default to max volume for SFX
