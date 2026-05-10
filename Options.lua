@@ -53,12 +53,12 @@ optionsPanel:SetScript("OnShow", function(self)
         return cb
     end
 
-    local enabledCb = createCheckbutton(self, "UHCSBEnalbedCB", "Enable Addon", "Toggle the addon on or off.", "enabled", -50)
-    local outOfCombatCb = createCheckbutton(self, "UHCSBOutOfCombatCB", "Play Out of Combat", "Play sound when you reach full HP out of combat.", "outOfCombat", -80)
-    local inCombatCb = createCheckbutton(self, "UHCSBInCombatCB", "Play In Combat", "Play sound when you reach full HP during combat.", "inCombat", -110)
-    local onlyRestingCb = createCheckbutton(self, "UHCSBOnlyRestingCB", "Play ONLY while Resting", "If checked, the sound will ONLY play if you are in a rested state.", "onlyResting", -140)
+    createCheckbutton(self, "UHCSBEnalbedCB", "Enable Addon", "Toggle the addon on or off.", "enabled", -50)
+    createCheckbutton(self, "UHCSBOutOfCombatCB", "Play Out of Combat", "Play sound when you reach full HP out of combat.", "outOfCombat", -80)
+    createCheckbutton(self, "UHCSBInCombatCB", "Play In Combat", "Play sound when you reach full HP during combat.", "inCombat", -110)
+    createCheckbutton(self, "UHCSBOnlyRestingCB", "Play ONLY while Resting", "If checked, the sound will ONLY play if you are in a rested state.", "onlyResting", -140)
 
-    local fishingEnabledCb = createCheckbutton(self, "UHCSBFishingEnabledCB", "Enable Fishing Alerts", "Enable features for fishing.", "fishingEnabled", -170)
+    createCheckbutton(self, "UHCSBFishingEnabledCB", "Enable Fishing Alerts", "Enable features for fishing.", "fishingEnabled", -170)
 
     -- Sliders for Fishing Volumes
     local function createSlider(parent, name, label, tooltip, dbKey, yOffset)
@@ -88,8 +88,8 @@ optionsPanel:SetScript("OnShow", function(self)
         return slider
     end
 
-    local sfxVolumeSlider = createSlider(self, "UHCSBFishingSFXSlider", "Fishing SFX/Master Volume", "Set the volume for sound effects and master volume while fishing.", "fishingSFXVolume", -210)
-    local bgVolumeSlider = createSlider(self, "UHCSBFishingBGSlider", "Fishing Background Volume", "Set the volume for music, ambience, and dialog while fishing.", "fishingBackgroundVolume", -260)
+    createSlider(self, "UHCSBFishingSFXSlider", "Fishing SFX/Master Volume", "Set the volume for sound effects and master volume while fishing.", "fishingSFXVolume", -210)
+    createSlider(self, "UHCSBFishingBGSlider", "Fishing Background Volume", "Set the volume for music, ambience, and dialog while fishing.", "fishingBackgroundVolume", -260)
 
     local fishingLabel = self:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
     fishingLabel:SetPoint("TOPLEFT", 16, -310)
